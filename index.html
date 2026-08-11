@@ -84,7 +84,7 @@
                 <h2 class="text-base font-bold">Zekatınızı Kolayca Hesaplayın</h2>
             </div>
             <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                Nakit, altın, gümüş, ticari mallar ve alacaklarınızdan borçlarınızı düşerek nisap miktarı üzerinden zekatınızı hesaplayın.
+                Nakit, altın, ticari mallar ve alacaklarınızdan borçlarınızı düşerek; 85 gram altın (nisap miktarı) sınırına göre zekatınızı hesaplayın.
             </p>
         </div>
 
@@ -93,12 +93,17 @@
             <h3 class="text-sm font-bold text-emerald-600 dark:text-emerald-400 mb-2">Varlık ve Borç Bilgileri</h3>
             
             <div>
+                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Güncel Gram Altın Fiyatı (TL)</label>
+                <input type="text" id="gold-price" value="3.000" oninput="formatInput(this)" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-slate-800 dark:text-slate-100" placeholder="Örn: 3.000">
+                <span class="text-[10px] text-slate-400 mt-0.5 block">Nisap sınırı (85 gram) otomatik hesaplanır.</span>
+            </div>
+            <div>
                 <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Nakit / Banka (TL)</label>
                 <input type="text" id="cash" placeholder="Örn: 50.000" oninput="formatInput(this)" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-slate-800 dark:text-slate-100">
             </div>
             <div>
-                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Altın (Gram veya Toplam TL Değeri)</label>
-                <input type="text" id="gold" placeholder="Örn: 30 gram veya 75.000 TL" oninput="formatInput(this)" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-slate-800 dark:text-slate-100">
+                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Altın Miktarı (Gram)</label>
+                <input type="text" id="gold-amount" placeholder="Örn: 90" oninput="formatInput(this)" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-slate-800 dark:text-slate-100">
             </div>
             <div>
                 <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Ticari Mallar (TL)</label>
@@ -122,7 +127,7 @@
         <div class="custom-card rounded-2xl p-5 shadow-sm text-center mb-4">
             <div class="text-xs text-slate-500 dark:text-slate-400 mb-1">Ödenmesi Gereken Zekat Miktarı</div>
             <div id="zakat-amount" class="text-2xl font-black text-emerald-600 dark:text-emerald-400">0,00 TL</div>
-            <div id="total-assets-desc" class="text-[11px] text-slate-400 mt-2">Net Varlık: 0,00 TL</div>
+            <div id="total-assets-desc" class="text-[11px] text-slate-400 mt-2">Net Varlık: 0,00 TL (Nisap Sınırı Altında)</div>
         </div>
     </div>
 
@@ -147,7 +152,6 @@
             updateThemeUI(isDark);
         });
 
-        // Kullanıcı yazarken binlik ayracı (nokta) ekleyen fonksiyon
         function formatInput(input) {
             let value = input.value.replace(/\D/g, '');
             if (value !== '') {
@@ -156,7 +160,6 @@
             input.value = value;
         }
 
-        // Temiz sayıya çevirme yardımcı fonksiyonu
         function parseCleanNumber(id) {
             const val = document.getElementById(id).value;
             if (!val) return 0;
@@ -165,20 +168,36 @@
         }
 
         function calculateZakat() {
+            const goldPrice = parseCleanNumber('gold-price') || 3000;
             const cash = parseCleanNumber('cash');
-            const gold = parseCleanNumber('gold');
+            const goldAmount = parseCleanNumber('gold-amount');
             const commercial = parseCleanNumber('commercial');
             const receivables = parseCleanNumber('receivables');
             const debts = parseCleanNumber('debts');
 
-            const netAssets = (cash + gold + commercial + receivables) - debts;
+            // Toplam altın TL karşılığı
+            const goldTotalValue = goldAmount * goldPrice;
+
+            // Net varlık hesabı
+            const netAssets = (cash + goldTotalValue + commercial + receivables) - debts;
             const finalAssets = netAssets > 0 ? netAssets : 0;
             
-            // 1/40 (%2.5) zekat oranı
-            const zakat = finalAssets * 0.025;
+            // 85 gram altın nisap sınırı
+            const nisapLimit = 85 * goldPrice;
+
+            let zakat = 0;
+            let statusText = "";
+
+            if (finalAssets >= nisapLimit) {
+                zakat = finalAssets * 0.025; // %2.5 zekat
+                statusText = `Net Varlık: ${finalAssets.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TL (Nisap Sınırı Aşıldı)`;
+            } else {
+                zakat = 0;
+                statusText = `Net Varlık: ${finalAssets.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TL (Nisap Sınırı Altında - Zekat Gerekmez)`;
+            }
 
             document.getElementById('zakat-amount').innerText = zakat.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' TL';
-            document.getElementById('total-assets-desc').innerText = `Net Varlık: ${finalAssets.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TL`;
+            document.getElementById('total-assets-desc').innerText = statusText;
         }
     </script>
 </body>
