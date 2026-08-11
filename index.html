@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zekat Hesaplama | İbadet Asistanı</title>
+    <title>Zekat Hesaplama - Ayetin Vakti</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -15,19 +15,43 @@
                         brand: {
                             50: '#f0fdf4',
                             100: '#dcfce7',
-                            500: '#22c55e',
-                            600: '#16a34a',
-                            700: '#15803d',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
                         }
                     }
                 }
             }
         }
     </script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --accent-color: #10b981;
+            --border-color: rgba(0, 0, 0, 0.05);
+        }
+        .dark {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.05);
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background 0.3s, color 0.3s;
+        }
+        .custom-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+        }
+    </style>
     <script>
-        // Sayfa yüklenmeden önce tema tercihini kontrol et (Flicker önleme)
         if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         } else {
@@ -35,127 +59,95 @@
         }
     </script>
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-300 flex flex-col justify-between">
+<body class="min-h-screen flex flex-col justify-between">
 
-    <!-- Üst Bar / Header -->
-    <header class="w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
-            <!-- Ana Menüye Dönüş Oku -->
-            <a href="index.html" class="flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-brand-600 dark:hover:text-brand-500 transition-colors group" aria-label="Ana Menüye Dön">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center bg-slate-100 dark:bg-slate-800 group-hover:bg-brand-50 dark:group-hover:bg-brand-950/50 transition-colors">
-                    <i class="fa-solid fa-arrow-left text-lg"></i>
-                </div>
-                <span class="font-medium text-sm hidden sm:inline">Ana Menü</span>
+    <div class="max-w-[480px] w-full mx-auto p-4 flex-1 flex flex-col">
+        <!-- Üst Header: Görseldeki Tasarımla Birebir (Sol Ok, Ortabaşlık, Sağ Tema İkonu) -->
+        <header class="flex justify-between items-center mb-6 relative">
+            <!-- Ana Menüye Dönüş Butonu (Daire İçinde Ok) -->
+            <a href="https://ayetinvakti.github.io/" class="w-10 h-10 rounded-2xl custom-card flex items-center justify-center text-xl hover:scale-105 transition-transform shadow-sm" aria-label="Ana Menüye Dön">
+                ←
             </a>
 
-            <!-- Başlık -->
-            <h1 class="text-lg font-semibold tracking-wide bg-gradient-to-r from-brand-600 to-emerald-500 bg-clip-text text-transparent">
+            <!-- Sayfa Başlığı -->
+            <h1 class="text-xl font-bold text-emerald-600 dark:text-emerald-400 tracking-wide text-center">
                 Zekat Hesaplama
             </h1>
 
-            <!-- Gece / Gündüz Modu Butonu (Yazısız, İkon) -->
-            <button id="theme-toggle" type="button" class="w-10 h-10 rounded-full flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors focus:outline-none" aria-label="Tema Değiştir">
-                <i class="fa-solid fa-moon dark:hidden text-lg"></i>
-                <i class="fa-solid fa-sun hidden dark:inline text-lg text-amber-400"></i>
+            <!-- Gece / Gündüz Modu Butonu (Daire İçinde İkon) -->
+            <button onclick="toggleTheme()" class="w-10 h-10 rounded-2xl custom-card flex items-center justify-center text-lg hover:scale-105 transition-transform shadow-sm" id="theme-btn" aria-label="Tema Değiştir">
+                <span id="theme-icon">🌙</span>
+            </button>
+        </header>
+
+        <!-- Açıklama / Giriş Kartı -->
+        <div class="custom-card rounded-2xl p-5 shadow-sm mb-4">
+            <div class="flex items-center gap-3 mb-2">
+                <span class="text-2xl">💰</span>
+                <h2 class="text-base font-bold">Zekatınızı Kolayca Hesaplayın</h2>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                Nakit, altın, gümüş, ticari mallar ve alacaklarınızdan borçlarınızı düşerek nisap miktarı üzerinden zekatınızı hesaplayın.
+            </p>
+        </div>
+
+        <!-- Hesaplama Form Alanı -->
+        <div class="custom-card rounded-2xl p-5 shadow-sm mb-4 space-y-3 flex-1">
+            <h3 class="text-sm font-bold text-emerald-600 dark:text-emerald-400 mb-2">Varlık ve Borç Bilgileri</h3>
+            
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Nakit / Banka (TL)</label>
+                <input type="number" id="cash" placeholder="0" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-slate-800 dark:text-slate-100">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Altın Değeri (Gram veya TL)</label>
+                <input type="number" id="gold" placeholder="0" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-slate-800 dark:text-slate-100">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Ticari Mallar</label>
+                <input type="number" id="commercial" placeholder="0" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-slate-800 dark:text-slate-100">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Verilecek Alacaklar (Ödünç)</label>
+                <input type="number" id="receivables" placeholder="0" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-slate-800 dark:text-slate-100">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Toplam Borçlar (Çıkılacak)</label>
+                <input type="number" id="debts" placeholder="0" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-slate-800 dark:text-slate-100">
+            </div>
+            
+            <button onclick="calculateZakat()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-all shadow-md text-sm mt-2">
+                Zekat Hesapla
             </button>
         </div>
-    </header>
 
-    <!-- Ana İçerik Alanı -->
-    <main class="max-w-4xl w-full mx-auto px-4 py-8 flex-grow">
-        <!-- Giriş Kartı / Açıklama -->
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm mb-8">
-            <div class="flex items-start gap-4">
-                <div class="w-12 h-12 rounded-xl bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-400 flex items-center justify-center shrink-0 text-xl">
-                    <i class="fa-solid fa-calculator"></i>
-                </div>
-                <div>
-                    <h2 class="text-xl font-bold mb-1">Zekatınızı Kolayca Hesaplayın</h2>
-                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
-                        Nakit varlıklarınız, altın, gümüş, ticari mallarınız ve borçlarınız üzerinden nisap miktarını dikkate alarak vermeniz gereken zekat miktarını hesaplayabilirsiniz.
-                    </p>
-                </div>
-            </div>
+        <!-- Sonuç Kutusu -->
+        <div class="custom-card rounded-2xl p-5 shadow-sm text-center mb-4">
+            <div class="text-xs text-slate-500 dark:text-slate-400 mb-1">Ödenmesi Gereken Zekat Miktarı</div>
+            <div id="zakat-amount" class="text-2xl font-black text-emerald-600 dark:text-emerald-400">0.00 TL</div>
+            <div id="total-assets-desc" class="text-[11px] text-slate-400 mt-2">Net Varlık: 0.00 TL</div>
         </div>
+    </div>
 
-        <!-- Hesaplama Formu Alanı (Örnek Yapı) -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Form Bölümü -->
-            <div class="md:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
-                <h3 class="text-base font-semibold mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-coins text-brand-500"></i> Varlık Bilgileri
-                </h3>
-                
-                <form id="zakat-form" class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Nakit / Banka Hesapları (TL)</label>
-                        <input type="number" id="cash" placeholder="0" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Altın Değeri (Gram / TL)</label>
-                        <input type="number" id="gold" placeholder="0" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Ticari Mallar</label>
-                        <input type="number" id="commercial" placeholder="0" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Verilecek Borçlar (Ödünç Verilen)</label>
-                        <input type="number" id="receivables" placeholder="0" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Toplam Borçlar (Çıkılacak)</label>
-                        <input type="number" id="debts" placeholder="0" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all">
-                    </div>
-                    
-                    <button type="button" onclick="calculateZakat()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-medium py-3 rounded-xl transition-colors shadow-lg shadow-brand-600/20 text-sm">
-                        Hesapla
-                    </button>
-                </form>
-            </div>
-
-            <!-- Sonuç Paneli -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
-                <div>
-                    <h3 class="text-base font-semibold mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-file-invoice-dollar text-brand-500"></i> Sonuç
-                    </h3>
-                    <div class="space-y-4">
-                        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                            <span class="text-xs text-slate-500 dark:text-slate-400 block mb-1">Toplam Net Varlık</span>
-                            <span id="total-assets" class="text-lg font-bold">0.00 TL</span>
-                        </div>
-                        <div class="p-4 rounded-xl bg-brand-50 dark:bg-brand-950/30 border border-brand-100 dark:border-brand-900/50">
-                            <span class="text-xs text-brand-600 dark:text-brand-400 block mb-1 font-medium">Ödenmesi Gereken Zekat</span>
-                            <span id="zakat-amount" class="text-2xl font-black text-brand-600 dark:text-brand-400">0.00 TL</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-400 text-center">
-                    Nisap miktarı 85 gram altın üzerinden değerlendirilmektedir.
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="w-full py-6 text-center text-xs text-slate-400 border-t border-slate-200 dark:border-slate-800 mt-12">
-        <p>Zekat Hesaplama Modülü &copy; 2026</p>
+    <footer class="text-center py-4 text-xs text-slate-400">
+        © Ayetin Vakti • Zekat Hesaplama Modülü
     </footer>
 
-    <!-- Tema Değiştirme ve Hesaplama Mantığı Scripti -->
     <script>
-        const themeToggleBtn = document.getElementById('theme-toggle');
+        function updateThemeUI(isDark) {
+            const icon = document.getElementById('theme-icon');
+            if (icon) icon.innerText = isDark ? '☀️' : '🌙';
+        }
 
-        themeToggleBtn.addEventListener('click', function () {
-            if (document.documentElement.classList.contains('dark')) {
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
-            } else {
-                document.documentElement.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
-            }
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeUI(isDark);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const isDark = document.documentElement.classList.contains('dark');
+            updateThemeUI(isDark);
         });
 
         function calculateZakat() {
@@ -165,16 +157,15 @@
             const receivables = parseFloat(document.getElementById('receivables').value) || 0;
             const debts = parseFloat(document.getElementById('debts').value) || 0;
 
-            const totalAssets = (cash + gold + commercial + receivables) - debts;
-            const finalAssets = totalAssets > 0 ? totalAssets : 0;
+            const netAssets = (cash + gold + commercial + receivables) - debts;
+            const finalAssets = netAssets > 0 ? netAssets : 0;
             
-            // Örnek nisap sınırı veya direkt %2.5 (1/40) hesaplama mantığı
-            const zakat = finalAssets >= 0 ? finalAssets * 0.025 : 0;
+            // 1/40 (%2.5) zekat oranı
+            const zakat = finalAssets * 0.025;
 
-            document.getElementById('total-assets').innerText = finalAssets.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' TL';
             document.getElementById('zakat-amount').innerText = zakat.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' TL';
+            document.getElementById('total-assets-desc').innerText = `Net Varlık: ${finalAssets.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TL`;
         }
     </script>
 </body>
 </html>
-
