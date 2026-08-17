@@ -1,9 +1,34 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <script>
+        // Tema ve Özel Renk Paleti Kontrolü (Sayfa yüklenmeden önce çalışır, titremeyi önler)
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (savedTheme === 'light' || (!savedTheme && !systemPrefersDark)) {
+            document.documentElement.classList.add('light-mode');
+        }
+
+        // Ayarlardan kaydedilen özel renkleri hemen uygula
+        const savedAccent = localStorage.getItem('custom_accent');
+        const savedBg = localStorage.getItem('custom_bg');
+        const savedText = localStorage.getItem('custom_text');
+
+        if (savedAccent) document.documentElement.style.setProperty('--primary-color', savedAccent);
+        if (savedBg) {
+            document.documentElement.style.setProperty('--bg-color', savedBg);
+            document.documentElement.style.setProperty('--card-bg', savedBg);
+        }
+        if (savedText) document.documentElement.style.setProperty('--text-color', savedText);
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zekat Hesaplama - Ayetin Vakti</title>
+    <title data-i18n="page_title">Zekat Hesaplama - Ayetin Vakti</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -26,20 +51,23 @@
     </script>
     <style>
         :root {
+            --bg-color: #0b1120;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary-color: #10b981;
+            --border-color: rgba(255, 255, 255, 0.05);
+        }
+
+        html.light-mode {
             --bg-color: #f8fafc;
             --card-bg: #ffffff;
             --text-main: #0f172a;
             --text-muted: #64748b;
-            --accent-color: #10b981;
+            --primary-color: #0d9488;
             --border-color: rgba(0, 0, 0, 0.05);
         }
-        .dark {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-color: rgba(255, 255, 255, 0.05);
-        }
+
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
@@ -52,10 +80,11 @@
         }
     </style>
     <script>
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        } else {
+        // Tailwind class entegrasyonu için tema senkronizasyonu
+        if (document.documentElement.classList.contains('light-mode')) {
             document.documentElement.classList.remove('dark');
+        } else {
+            document.documentElement.classList.add('dark');
         }
     </script>
 </head>
@@ -68,7 +97,7 @@
                 ←
             </a>
 
-            <h1 class="text-xl font-bold text-emerald-600 dark:text-emerald-400 tracking-wide text-center">
+            <h1 class="text-xl font-bold text-emerald-600 dark:text-emerald-400 tracking-wide text-center" style="color: var(--primary-color);" data-i18n="header_title">
                 Zekat Hesaplama
             </h1>
 
@@ -81,75 +110,169 @@
         <div class="custom-card rounded-2xl p-5 shadow-sm mb-4">
             <div class="flex items-center gap-3 mb-2">
                 <span class="text-2xl">💰</span>
-                <h2 class="text-base font-bold">Zekatınızı Kolayca Hesaplayın</h2>
+                <h2 class="text-base font-bold" data-i18n="card_desc_title">Zekatınızı Kolayca Hesaplayın</h2>
             </div>
-            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed" data-i18n="card_desc_text">
                 Nakit, altın, ticari mallar ve alacaklarınızdan borçlarınızı düşerek; 85 gram altın (nisap miktarı) sınırına göre zekatınızı hesaplayın.
             </p>
         </div>
 
         <!-- Hesaplama Form Alanı -->
         <div class="custom-card rounded-2xl p-5 shadow-sm mb-4 space-y-3 flex-1">
-            <h3 class="text-sm font-bold text-emerald-600 dark:text-emerald-400 mb-2">Varlık ve Borç Bilgileri</h3>
+            <h3 class="text-sm font-bold text-emerald-600 dark:text-emerald-400 mb-2" style="color: var(--primary-color);" data-i18n="form_header">Varlık ve Borç Bilgileri</h3>
             
             <div>
-                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Güncel Gram Altın Fiyatı (TL)</label>
+                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1" data-i18n="label_gold_price">Güncel Gram Altın Fiyatı (TL)</label>
                 <input type="text" id="gold-price" value="3.000" oninput="formatInput(this)" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-slate-800 dark:text-slate-100" placeholder="Örn: 3.000">
-                <span class="text-[10px] text-slate-400 mt-0.5 block">Nisap sınırı (85 gram) otomatik hesaplanır.</span>
+                <span class="text-[10px] text-slate-400 mt-0.5 block" data-i18n="label_nisap_note">Nisap sınırı (85 gram) otomatik hesaplanır.</span>
             </div>
             <div>
-                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Nakit / Banka (TL)</label>
+                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1" data-i18n="label_cash">Nakit / Banka (TL)</label>
                 <input type="text" id="cash" placeholder="Örn: 50.000" oninput="formatInput(this)" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-slate-800 dark:text-slate-100">
             </div>
             <div>
-                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Altın Miktarı (Gram)</label>
+                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1" data-i18n="label_gold_amount">Altın Miktarı (Gram)</label>
                 <input type="text" id="gold-amount" placeholder="Örn: 90" oninput="formatInput(this)" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-slate-800 dark:text-slate-100">
             </div>
             <div>
-                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Ticari Mallar (TL)</label>
+                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1" data-i18n="label_commercial">Ticari Mallar (TL)</label>
                 <input type="text" id="commercial" placeholder="Örn: 20.000" oninput="formatInput(this)" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-slate-800 dark:text-slate-100">
             </div>
             <div>
-                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Verilecek Alacaklar / Ödünç (TL)</label>
+                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1" data-i18n="label_receivables">Verilecek Alacaklar / Ödünç (TL)</label>
                 <input type="text" id="receivables" placeholder="Örn: 5.000" oninput="formatInput(this)" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-slate-800 dark:text-slate-100">
             </div>
             <div>
-                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Toplam Borçlar - Çıkılacak (TL)</label>
+                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1" data-i18n="label_debts">Toplam Borçlar - Çıkılacak (TL)</label>
                 <input type="text" id="debts" placeholder="Örn: 10.000" oninput="formatInput(this)" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-slate-800 dark:text-slate-100">
             </div>
             
-            <button onclick="calculateZakat()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-all shadow-md text-sm mt-2">
+            <button onclick="calculateZakat()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-all shadow-md text-sm mt-2" style="background-color: var(--primary-color);" data-i18n="btn_calculate">
                 Zekat Hesapla
             </button>
         </div>
 
         <!-- Sonuç Kutusu -->
         <div class="custom-card rounded-2xl p-5 shadow-sm text-center mb-4">
-            <div class="text-xs text-slate-500 dark:text-slate-400 mb-1">Ödenmesi Gereken Zekat Miktarı</div>
-            <div id="zakat-amount" class="text-2xl font-black text-emerald-600 dark:text-emerald-400">0,00 TL</div>
-            <div id="total-assets-desc" class="text-[11px] text-slate-400 mt-2">Net Varlık: 0,00 TL (Nisap Sınırı Altında)</div>
+            <div class="text-xs text-slate-500 dark:text-slate-400 mb-1" data-i18n="result_title">Ödenmesi Gereken Zekat Miktarı</div>
+            <div id="zakat-amount" class="text-2xl font-black text-emerald-600 dark:text-emerald-400" style="color: var(--primary-color);">0,00 TL</div>
+            <div id="total-assets-desc" class="text-[11px] text-slate-400 mt-2" data-i18n="result_default_desc">Net Varlık: 0,00 TL (Nisap Sınırı Altında)</div>
         </div>
     </div>
 
-    <footer class="text-center py-4 text-xs text-slate-400">
+    <footer class="text-center py-4 text-xs text-slate-400" data-i18n="footer_text">
         © Ayetin Vakti • Zekat Hesaplama Modülü
     </footer>
 
     <script>
-        function updateThemeUI(isDark) {
+        // Dil Sözlüğü
+        const translations = {
+            tr: {
+                page_title: "Zekat Hesaplama - Ayetin Vakti",
+                header_title: "Zekat Hesaplama",
+                card_desc_title: "Zekatınızı Kolayca Hesaplayın",
+                card_desc_text: "Nakit, altın, ticari mallar ve alacaklarınızdan borçlarınızı düşerek; 85 gram altın (nisap miktarı) sınırına göre zekatınızı hesaplayın.",
+                form_header: "Varlık ve Borç Bilgileri",
+                label_gold_price: "Güncel Gram Altın Fiyatı (TL)",
+                label_nisap_note: "Nisap sınırı (85 gram) otomatik hesaplanır.",
+                label_cash: "Nakit / Banka (TL)",
+                label_gold_amount: "Altın Miktarı (Gram)",
+                label_commercial: "Ticari Mallar (TL)",
+                label_receivables: "Verilecek Alacaklar / Ödünç (TL)",
+                label_debts: "Toplam Borçlar - Çıkılacak (TL)",
+                btn_calculate: "Zekat Hesapla",
+                result_title: "Ödenmesi Gereken Zekat Miktarı",
+                result_default_desc: "Net Varlık: 0,00 TL (Nisap Sınırı Altında)",
+                footer_text: "© Ayetin Vakti • Zekat Hesaplama Modülü",
+                nisap_asildi: "Net Varlık: ",
+                nisap_asildi_text: " TL (Nisap Sınırı Aşıldı)",
+                nisap_alti_text: " TL (Nisap Sınırı Altında - Zekat Gerekmez)"
+            },
+            en: {
+                page_title: "Zakat Calculator - Ayetin Vakti",
+                header_title: "Zakat Calculator",
+                card_desc_title: "Calculate Your Zakat Easily",
+                card_desc_text: "Calculate your zakat by subtracting your debts from cash, gold, trade goods, and receivables, based on the 85-gram gold nisab threshold.",
+                form_header: "Assets and Liabilities",
+                label_gold_price: "Current Gold Price per Gram (TL)",
+                label_nisap_note: "Nisab limit (85 grams) is calculated automatically.",
+                label_cash: "Cash / Bank (TL)",
+                label_gold_amount: "Gold Amount (Grams)",
+                label_commercial: "Trade Goods (TL)",
+                label_receivables: "Receivables / Loans (TL)",
+                label_debts: "Total Debts / Deductions (TL)",
+                btn_calculate: "Calculate Zakat",
+                result_title: "Required Zakat Amount",
+                result_default_desc: "Net Assets: 0,00 TL (Below Nisab Threshold)",
+                footer_text: "© Ayetin Vakti • Zakat Calculation Module",
+                nisap_asildi: "Net Assets: ",
+                nisap_asildi_text: " TL (Nisab Threshold Exceeded)",
+                nisap_alti_text: " TL (Below Nisab Threshold - No Zakat Required)"
+            },
+            ar: {
+                page_title: "حاسبة الزكاة - آية الوقت",
+                header_title: "حاسبة الزكاة",
+                card_desc_title: "احسب زكاتك بكل سهولة",
+                card_desc_text: "احسب زكاتك بطرح ديونك من النقد والذهب والعروض التجارية والديون المرصودة، بناءً على نصاب الذهب (85 جراماً).",
+                form_header: "بيانات الأصول والديون",
+                label_gold_price: "سعر الذهب الحالي للجرام (ليرة)",
+                label_nisap_note: "يتم حساب حد النصاب (85 جراماً) تلقائياً.",
+                label_cash: "النقد / البنك (ليرة)",
+                label_gold_amount: "كمية الذهب (جرام)",
+                label_commercial: "العروض التجارية (ليرة)",
+                label_receivables: "الديون المستحقة / القروض (ليرة)",
+                label_debts: "إجمالي الديون المستقطعة (ليرة)",
+                btn_calculate: "حساب الزكاة",
+                result_title: "مبلغ الزكاة الواجب إخراجه",
+                result_default_desc: "صافي الأصول: 0,00 ليرة (دون حد النصاب)",
+                footer_text: "© آية الوقت • وحدة حساب الزكاة",
+                nisap_asildi: "صافي الأصول: ",
+                nisap_asildi_text: " ليرة (تم تجاوز حد النصاب)",
+                nisap_alti_text: " ليرة (دون حد النصاب - لا تجب الزكاة)"
+            }
+        };
+
+        const currentLang = localStorage.getItem('user_lang') || 'tr';
+
+        function updateThemeUI(isLight) {
             const icon = document.getElementById('theme-icon');
-            if (icon) icon.innerText = isDark ? '☀️' : '🌙';
+            if (icon) icon.innerText = isLight ? '☀️' : '🌙';
         }
 
         function toggleTheme() {
-            const isDark = document.documentElement.classList.toggle('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            updateThemeUI(isDark);
+            const isLight = document.documentElement.classList.toggle('light-mode');
+            if (isLight) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+            updateThemeUI(isLight);
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const isDark = document.documentElement.classList.contains('dark');
-            updateThemeUI(isDark);
+            const isLight = document.documentElement.classList.contains('light-mode');
+            updateThemeUI(isLight);
+
+            // Dil ve metin entegrasyonu
+            if (translations[currentLang]) {
+                document.querySelectorAll('[data-i18n]').forEach(element => {
+                    const key = element.getAttribute('data-i18n');
+                    if (translations[currentLang][key]) {
+                        if (element.tagName === 'TITLE') {
+                            document.title = translations[currentLang][key];
+                        } else {
+                            element.textContent = translations[currentLang][key];
+                        }
+                    }
+                });
+                if (currentLang === 'ar') {
+                    document.documentElement.setAttribute('dir', 'rtl');
+                } else {
+                    document.documentElement.setAttribute('dir', 'ltr');
+                }
+            }
         });
 
         function formatInput(input) {
@@ -187,16 +310,18 @@
 
             let zakat = 0;
             let statusText = "";
+            const t = translations[currentLang] || translations['tr'];
+            const formattedAssets = finalAssets.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
             if (finalAssets >= nisapLimit) {
                 zakat = finalAssets * 0.025; // %2.5 zekat
-                statusText = `Net Varlık: ${finalAssets.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TL (Nisap Sınırı Aşıldı)`;
+                statusText = `${t.nisap_asildi}${formattedAssets}${t.nisap_asildi_text}`;
             } else {
                 zakat = 0;
-                statusText = `Net Varlık: ${finalAssets.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TL (Nisap Sınırı Altında - Zekat Gerekmez)`;
+                statusText = `${t.nisap_asildi}${formattedAssets}${t.nisap_alti_text}`;
             }
 
-            document.getElementById('zakat-amount').innerText = zakat.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' TL';
+            document.getElementById('zakat-amount').innerText = zakat.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + (currentLang === 'ar' ? ' ليرة' : ' TL');
             document.getElementById('total-assets-desc').innerText = statusText;
         }
     </script>
