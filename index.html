@@ -258,12 +258,9 @@
             updateThemeUI(isLight);
         }
 
-        // Sayfa açılışında buton ikonunu doğru değere ayarla
-        if (localStorage.getItem('theme') === 'light' || (!localStorage.getItem('theme') && !window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            updateThemeUI(true);
-        } else {
-            updateThemeUI(false);
-        }
+        // Sayfa açılışında ikonu anında doğru moda göre ayarla
+        const isCurrentLight = document.documentElement.classList.contains('light-mode');
+        updateThemeUI(isCurrentLight);
 
         document.addEventListener('DOMContentLoaded', () => {
             const isLight = document.documentElement.classList.contains('light-mode');
