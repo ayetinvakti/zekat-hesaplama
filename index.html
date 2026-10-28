@@ -5,33 +5,50 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
 
-    <script>
-        // Tema, Özel Renk Paleti ve Dil Kontrolü (sayfa çizilmeden önce çalışır)
-        const savedTheme = localStorage.getItem('theme');
-        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (savedTheme === 'light' || (!savedTheme && !systemPrefersDark)) {
-            document.documentElement.classList.add('light-mode');
-        }
-
-        const savedAccent = localStorage.getItem('custom_accent');
-        const savedBg = localStorage.getItem('custom_bg');
-        const savedText = localStorage.getItem('custom_text');
-
-        if (savedAccent) document.documentElement.style.setProperty('--accent-color', savedAccent);
-        if (savedBg) {
-            document.documentElement.style.setProperty('--bg-color', savedBg);
-            document.documentElement.style.setProperty('--card-bg', savedBg);
-        }
-        if (savedText) document.documentElement.style.setProperty('--text-color', savedText);
-
-        const currentLang = localStorage.getItem('user_lang') || 'tr';
-        document.documentElement.setAttribute('lang', currentLang);
-        document.documentElement.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
-    </script>
-
     <meta charset="UTF-8">
-    <!-- DÜZELTME: Yakınlaştırmayı engelleyen maximum-scale / user-scalable=no kaldırıldı -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f172a">
+
+    <script>
+        // Tema, özel renk paleti ve dil (sayfa çizilmeden önce çalışır)
+        (function () {
+            const d = document.documentElement;
+            const savedTheme = localStorage.getItem('theme');
+            const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const isLight = savedTheme === 'light' || (!savedTheme && !systemPrefersDark);
+            if (isLight) d.classList.add('light-mode');
+            const a = localStorage.getItem('custom_accent');
+            const t = localStorage.getItem('custom_text');
+            const b = localStorage.getItem('custom_bg');
+            if (a) d.style.setProperty('--accent-color', a);
+            if (t) d.style.setProperty('--text-color', t);
+            if (b) {
+                d.style.setProperty('--bg-color', b);
+                d.style.setProperty('--card-bg', b);
+            }
+            // Özel arka plan var, yazı rengi seçilmemişse okunabilir renkleri zeminin açıklığına göre seç
+            if (b && !t) {
+                const m = /^#([0-9a-f]{6})$/i.exec(b.trim());
+                if (m) {
+                    const n = parseInt(m[1], 16);
+                    const lin = c => { c /= 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
+                    const L = 0.2126 * lin(n >> 16) + 0.7152 * lin((n >> 8) & 255) + 0.0722 * lin(n & 255);
+                    const bgIsLight = L > 0.18;
+                    d.style.setProperty('--text-color', bgIsLight ? '#0f172a' : '#f8fafc');
+                    d.style.setProperty('--text-muted', bgIsLight ? '#475569' : '#cbd5e1');
+                    d.style.setProperty('--border-color', bgIsLight ? 'rgba(15,23,42,0.18)' : 'rgba(248,250,252,0.22)');
+                }
+            }
+            // Safari üst/alt çubuğu sayfa zemin rengine uysun
+            const meta = document.querySelector('meta[name="theme-color"]');
+            if (meta) meta.setAttribute('content', b || (isLight ? '#f8fafc' : '#0f172a'));
+
+            // Dil ve yön
+            const lang = localStorage.getItem('user_lang') || 'tr';
+            d.setAttribute('lang', lang);
+            d.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+        })();
+    </script>
     <title data-i18n="page_title">Zekat Hesaplama | Ayetin Vakti</title>
     
     <meta property="og:title" content="Zekat Hesaplama | Ayetin Vakti">
@@ -50,6 +67,7 @@
             --btn-hover: rgba(255, 255, 255, 0.1);
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
             --warn: #f59e0b;
+            color-scheme: dark;
         }
 
         html.light-mode {
@@ -63,7 +81,11 @@
             --btn-hover: #e2e8f0;
             --shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
             --warn: #d97706;
+            color-scheme: light;
         }
+
+        /* Tuşlara ard arda basınca sayfa yakınlaşmasın */
+        html, body, button, a, select, input, label, [onclick] { touch-action: manipulation; }
 
         * {
             box-sizing: border-box;
@@ -94,7 +116,9 @@
             width: 38px; height: 38px; border-radius: 50%; font-size: 1.1rem; font-weight: 600; cursor: pointer;
             display: flex; align-items: center; justify-content: center; text-decoration: none;
         }
-        .home-btn:hover, .theme-icon-btn:hover { background-color: var(--btn-hover); }
+        @media (hover: hover) {
+            .home-btn:hover, .theme-icon-btn:hover { background-color: var(--btn-hover); }
+        }
 
         .header { width: 100%; text-align: center; margin-bottom: 15px; }
         .header h1 { font-size: 1.6rem; color: var(--accent-color); margin-bottom: 6px; }
@@ -124,7 +148,9 @@
         .input-note.warn { color: var(--warn); }
 
         .btn-primary { width: 100%; background-color: var(--accent-color); color: #ffffff; border: none; padding: 12px; border-radius: 12px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 8px; transition: opacity 0.2s; }
-        .btn-primary:hover { opacity: 0.9; }
+        @media (hover: hover) {
+            .btn-primary:hover { opacity: 0.9; }
+        }
 
         .result-box { text-align: center; }
         .result-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px; }
@@ -145,7 +171,7 @@
 <div class="container">
     <div class="navbar">
         <a href="../" class="home-btn" title="Ana Sayfa" aria-label="Ana Sayfa" data-i18n-title="home_title">←</a>
-        <button class="theme-icon-btn" onclick="toggleTheme()" id="theme-btn" title="Tema Değiştir" aria-label="Tema Değiştir" data-i18n-title="theme_title">☀️</button>
+        <button class="theme-icon-btn" onclick="toggleTheme()" id="theme-btn" title="Tema Değiştir" aria-label="Tema Değiştir" data-i18n-title="theme_title">🌙</button>
     </div>
 
     <div class="header">
@@ -385,10 +411,18 @@
     function updateThemeButton() {
         document.getElementById('theme-btn').textContent = document.documentElement.classList.contains('light-mode') ? '☀️' : '🌙';
     }
+    // Safari üst/alt çubuğu sayfa zemin rengine uysun
+    function updateThemeColor() {
+        const meta = document.querySelector('meta[name="theme-color"]');
+        if (!meta) return;
+        const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg-color').trim();
+        if (bg) meta.setAttribute('content', bg);
+    }
     function toggleTheme() {
         const isLight = document.documentElement.classList.toggle('light-mode');
         localStorage.setItem('theme', isLight ? 'light' : 'dark');
         updateThemeButton();
+        updateThemeColor();
     }
 
     // ===================== GİRİŞ BİÇİMLENDİRME =====================
@@ -488,6 +522,7 @@
         });
         document.title = T.page_title;
         updateThemeButton();
+        updateThemeColor();
 
         document.querySelectorAll('input[data-money]').forEach(inp => inp.addEventListener('input', handleInput));
         document.getElementById('gold-price').value = localStorage.getItem('zekat_gold_price') || '';
