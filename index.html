@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+    <script src="https://ayetinvakti.github.io/menu.js" defer></script>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -109,7 +110,7 @@
         .container { width: 100%; max-width: 480px; display: flex; flex-direction: column; }
 
         .navbar { width: 100%; display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; position: relative; }
-        [dir="rtl"] .navbar { flex-direction: row-reverse; }
+        .nav-group { display: flex; align-items: center; gap: 8px; }
 
         .home-btn, .theme-icon-btn {
             background-color: var(--btn-bg); border: 1px solid var(--border-color); color: var(--text-color);
@@ -121,7 +122,8 @@
         }
 
         .header { width: 100%; text-align: center; margin-bottom: 15px; }
-        .header h1 { font-size: 1.6rem; color: var(--accent-color); margin-bottom: 6px; }
+        /* Başlık görsel olarak gizli (ekran okuyucu için h1 kalır) */
+        .header h1 { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
         .header p { color: var(--text-muted); font-size: 0.9rem; }
 
         .card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 18px; width: 100%; margin-bottom: 15px; box-shadow: var(--shadow); }
@@ -170,7 +172,10 @@
 
 <div class="container">
     <div class="navbar">
-        <a href="../" class="home-btn" title="Ana Sayfa" aria-label="Ana Sayfa" data-i18n-title="home_title">←</a>
+        <div class="nav-group">
+            <a href="https://ayetinvakti.github.io/" class="home-btn" title="Ana Sayfa" aria-label="Ana Sayfa" data-i18n-title="home_title">←</a>
+            <button class="theme-icon-btn" data-drawer-toggle aria-label="Menü" aria-controls="avmDrawer" title="Menü">☰</button>
+        </div>
         <button class="theme-icon-btn" onclick="toggleTheme()" id="theme-btn" title="Tema Değiştir" aria-label="Tema Değiştir" data-i18n-title="theme_title">🌙</button>
     </div>
 
