@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+    <script src="https://ayetinvakti.github.io/finish.js?v=5"></script>
     <script src="https://ayetinvakti.github.io/menu.js" defer></script>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
@@ -173,10 +174,10 @@
 <div class="container">
     <div class="navbar">
         <div class="nav-group">
-            <a href="https://ayetinvakti.github.io/" class="home-btn" title="Ana Sayfa" aria-label="Ana Sayfa" data-i18n-title="home_title">←</a>
-            <button class="theme-icon-btn" data-drawer-toggle aria-label="Menü" aria-controls="avmDrawer" title="Menü">☰</button>
+            <a href="https://ayetinvakti.github.io/" class="home-btn fin-btn" title="Ana Sayfa" aria-label="Ana Sayfa" data-i18n-title="home_title">←</a>
+            <button class="theme-icon-btn fin-btn" data-drawer-toggle aria-label="Menü" aria-controls="avmDrawer" title="Menü">☰</button>
         </div>
-        <button class="theme-icon-btn" onclick="toggleTheme()" id="theme-btn" title="Tema Değiştir" aria-label="Tema Değiştir" data-i18n-title="theme_title">🌙</button>
+        <button class="theme-icon-btn fin-btn" onclick="toggleTheme()" id="theme-btn" title="Tema Değiştir" aria-label="Tema Değiştir" data-i18n-title="theme_title">🌙</button>
     </div>
 
     <div class="header">
@@ -184,13 +185,13 @@
         <p data-i18n="header_desc">Mal varlığınızın zekat miktarını kolayca hesaplayın</p>
     </div>
 
-    <div class="card">
+    <div class="card fin-card">
         <div class="card-title"><span>💡</span> <span data-i18n="card_desc_title">Nisap Miktarı Nedir?</span></div>
         <p class="card-text" data-i18n="card_desc_text"></p>
         <p class="card-text" data-i18n="card_desc_text2"></p>
     </div>
 
-    <div class="card">
+    <div class="card fin-card">
         <div class="card-title" data-i18n="prices_header">Güncel Fiyatlar</div>
         <div class="two-col">
             <div class="form-group">
@@ -212,7 +213,7 @@
         </div>
     </div>
 
-    <div class="card">
+    <div class="card fin-card">
         <div class="card-title" data-i18n="form_header">Varlık ve Borç Bilgileri</div>
 
         <div class="form-group">
@@ -254,10 +255,10 @@
             <span class="input-note" data-i18n="debts_note"></span>
         </div>
 
-        <button class="btn-primary" onclick="calculateZakat()" data-i18n="btn_calculate">Zekat Hesapla</button>
+        <button class="btn-primary fin-btn" onclick="calculateZakat()" data-i18n="btn_calculate">Zekat Hesapla</button>
     </div>
 
-    <div class="card result-box">
+    <div class="card result-box fin-card">
         <div class="result-title" data-i18n="result_title">Ödenmesi Gereken Zekat Miktarı</div>
         <div class="result-value" id="zakat-amount">0,00 TL</div>
         <div class="result-desc" id="total-assets-desc" data-i18n="result_default_desc"></div>
